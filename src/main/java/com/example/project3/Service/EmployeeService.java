@@ -5,6 +5,7 @@ import com.example.project3.Model.User;
 import com.example.project3.Repository.EmployeeRepository;
 import com.example.project3.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,27 +17,36 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final UserRepository userRepository;
 
-    public void addEmployee(Integer userId, Employee employee){
-        User user = userRepository.findUserById(userId);
-               if (user==null){
-                   throw new ApiException("User not found");
-               }
+    public void registerEmployee(User userInput, Employee employeeInput) {
+        if (userRepository.findUserByUsername(userInput.getUsername()) != null) {
+            throw new ApiException("Username already taken");
+        }
+        User user = new User();
+        user.setUsername(userInput.getUsername());
+        user.setPassword(new BCryptPasswordEncoder().encode(userInput.getPassword()));
+        user.setEmail(userInput.getEmail());
+        user.setName(userInput.getName());
+        user.setRole("EMPLOYEE");
+        userRepository.save(user);
 
+        Employee employee = new Employee();
+        employee.setPosition(employeeInput.getPosition());
+        employee.setSalary(employeeInput.getSalary());
         employee.setUser(user);
         employeeRepository.save(employee);
     }
 
-    public List<Employee> getAllEmployees(){
-        return employeeRepository.findAll();
+    public Employee getMyEmployee(User user) {
+        Employee employee = employeeRepository.findEmployeeByUserId(user.getId());
+        if (employee == null) {
+            throw new ApiException("Employee not found");
+        }
+        return employee;
     }
 
-    public Employee getEmployeeById(Integer id){
-        return employeeRepository.findEmployeeById(id);
-    }
 
-
-    public void updateEmployee(Integer id, Employee newEmployee){
-        Employee oldEmployee = employeeRepository.findEmployeeById(id);
+    public void updateEmployee(User user, Employee newEmployee){
+        Employee oldEmployee = employeeRepository.findEmployeeById(user.getId());
         if (oldEmployee==null){
             throw new ApiException("Employee not found");
         }
@@ -45,8 +55,8 @@ public class EmployeeService {
         employeeRepository.save(oldEmployee);
     }
 
-    public void deleteEmployee(Integer id){
-        Employee employee = employeeRepository.findEmployeeById(id);
+    public void deleteEmployee(User user){
+        Employee employee = employeeRepository.findEmployeeById(user.getId());
         if (employee==null){
             throw new ApiException("employee not found");
         }
