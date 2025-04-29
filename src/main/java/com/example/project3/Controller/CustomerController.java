@@ -3,10 +3,13 @@ package com.example.project3.Controller;
 import com.example.project3.API.ApiResponse;
 import com.example.project3.Model.Customer;
 import com.example.project3.Model.Account;
+import com.example.project3.Model.User;
+import com.example.project3.Service.AccountService;
 import com.example.project3.Service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -17,32 +20,40 @@ import java.util.Set;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final AccountService accountService;
 
-    @PostMapping("/create/{userId}")
-    public ResponseEntity createCustomer(@PathVariable Integer userId, @RequestBody @Valid Customer customer){
-        customerService.addCustomer(userId, customer);
-        return ResponseEntity.status(200).body(new ApiResponse("Customer added successfully"));
+
+
+    @PostMapping("/register")
+    public ResponseEntity registerCustomer(@RequestBody @Valid User user, @RequestBody @Valid Customer customer) {
+        customerService.registerCustomer(user, customer);
+        return ResponseEntity.status(200).body(new ApiResponse("Customer registered successfully"));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomerById(@PathVariable Integer id){
-        return ResponseEntity.status(200).body(customerService.getCustomerById(id));
+
+    @GetMapping("/profile")
+    public ResponseEntity<Customer> getMyProfile(@AuthenticationPrincipal User user) {
+        return ResponseEntity.status(200).body(customerService.getMyCustomer(user));
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity updateCustomer(@PathVariable Integer id, @RequestBody @Valid Customer customer){
-        customerService.updateCustomer(id, customer);
+
+    @PutMapping("/update")
+    public ResponseEntity updateCustomer(@AuthenticationPrincipal User user, @RequestBody @Valid Customer customer) {
+        customerService.updateCustomer(user, customer);
         return ResponseEntity.status(200).body(new ApiResponse("Customer updated successfully"));
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity deleteCustomer(@PathVariable Integer id){
-        customerService.deleteCustomer(id);
-        return ResponseEntity.status(200).body(new ApiResponse("deleted successfully"));
+    @DeleteMapping("/delete")
+    public ResponseEntity deleteCustomer(@AuthenticationPrincipal User user) {
+        customerService.deleteCustomer(user);
+        return ResponseEntity.status(200).body(new ApiResponse("Customer deleted successfully"));
     }
 
-    @GetMapping("/accounts/{customerId}")
-    public ResponseEntity<Set<Account>> getCustomerAccounts(@PathVariable Integer customerId){
-        return ResponseEntity.status(200).body(customerService.getCustomerAccounts(customerId));
+
+    @GetMapping("/my-accounts")
+    public ResponseEntity getMyAccounts(@AuthenticationPrincipal User user) {
+        Set<Account> accounts = accountService.getAccountsByUser(user.getId());
+        return ResponseEntity.status(200).body(accounts);
     }
+
 }
