@@ -2,11 +2,14 @@ package com.example.project3.Controller;
 
 
 import com.example.project3.API.ApiResponse;
+import com.example.project3.DTO.EmployeeDTO;
 import com.example.project3.Model.Employee;
+import com.example.project3.Model.User;
 import com.example.project3.Service.EmployeeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -17,31 +20,27 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-    @PostMapping("/create/{userId}")
-    public ResponseEntity createEmployee(@PathVariable Integer userId, @RequestBody @Valid Employee employee){
-        employeeService.addEmployee(userId, employee);
-        return ResponseEntity.status(200).body(new ApiResponse("Employee added successfully"));
+    @PostMapping("/register")
+    public ResponseEntity registerEmployee(@RequestBody @Valid EmployeeDTO dto) {
+        employeeService.registerEmployee(dto.getUser(), dto.getEmployee());
+        return ResponseEntity.status(201).body(new ApiResponse("Employee registered successfully"));
     }
 
-    @GetMapping("/getall")
-    public ResponseEntity getAllEmployees(){
-        return ResponseEntity.status(200).body(employeeService.getAllEmployees());
+    @GetMapping("/profile")
+    public ResponseEntity getMyProfile(@AuthenticationPrincipal User user) {
+        return ResponseEntity.status(200).body(employeeService.getMyEmployee(user));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable Integer id){
-        return ResponseEntity.status(200).body(employeeService.getEmployeeById(id));
+
+    @PutMapping("/update")
+    public ResponseEntity updateEmployee(@AuthenticationPrincipal User user, @RequestBody @Valid Employee employee) {
+        employeeService.updateEmployee(user, employee);
+        return ResponseEntity.status(200).body(new ApiResponse("Employee updated successfully"));
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity updateEmployee(@PathVariable Integer id, @RequestBody @Valid Employee employee){
-        employeeService.updateEmployee(id, employee);
-        return ResponseEntity.status(200).body(new ApiResponse("employee updated successfully"));
-    }
-
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity deleteEmployee(@PathVariable Integer id){
-        employeeService.deleteEmployee(id);
-        return ResponseEntity.status(200).body(new ApiResponse("employee deleted successfully"));
+    @DeleteMapping("/delete")
+    public ResponseEntity deleteEmployee(@AuthenticationPrincipal User user) {
+        employeeService.deleteEmployee(user);
+        return ResponseEntity.status(200).body(new ApiResponse("Employee deleted successfully"));
     }
 }
