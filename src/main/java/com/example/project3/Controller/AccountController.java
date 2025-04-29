@@ -19,10 +19,11 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    @PostMapping("/create/{customerId}")
-    public ResponseEntity createAccount(@PathVariable Integer customerId, @RequestBody @Valid Account account){
-        accountService.createAccount(customerId, account);
-        return ResponseEntity.status(200).body(new ApiResponse("Account created successfully"));
+    @PostMapping("/create")
+    public ResponseEntity<ApiResponse> createAccount(@AuthenticationPrincipal User user,
+                                                     @RequestBody @Valid Account account) {
+        accountService.createAccount(user.getId(), account);
+        return ResponseEntity.status(201).body(new ApiResponse("Account created successfully"));
     }
 
     @PutMapping("/activate/{accountId}")
@@ -32,8 +33,8 @@ public class AccountController {
     }
 
     @GetMapping("/my-accounts")
-    public ResponseEntity<Set<Account>> getMyAccounts(@AuthenticationPrincipal User user){
-        return ResponseEntity.ok(accountService.getAccountsByUser(user.getId()));
+    public ResponseEntity getMyAccounts(@AuthenticationPrincipal User user){
+        return ResponseEntity.status(200).body(accountService.getAccountsByUser(user.getId()));
     }
 
     @GetMapping("/{accountId}")
