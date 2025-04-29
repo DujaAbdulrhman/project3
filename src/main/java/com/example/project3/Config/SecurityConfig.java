@@ -34,11 +34,9 @@ public class SecurityConfig {
                 .and()
                 .authenticationProvider(daoAuthenticationProvider())
                 .authorizeHttpRequests()
-                .requestMatchers("/api/v1/auth/**").permitAll() // فتح مسارات التسجيل
-                .requestMatchers("/api/v1/user/**").authenticated() // CRUD لليوزر يتطلب تسجيل دخول
-                .requestMatchers("/api/v1/account/**").authenticated()
-                .requestMatchers("/api/v1/customer/**").authenticated()
-                .requestMatchers("/api/v1/employee/**").authenticated()
+                .requestMatchers("/api/v1/customer/**").hasRole("CUSTOMER")
+                .requestMatchers("/api/v1/employee/**").hasRole("EMPLOYEE")
+                .requestMatchers("/api/v1/account/**").hasRole("CUSTOMER")
                 .anyRequest().authenticated()
                 .and()
                 .logout().logoutUrl("/api/v1/logout").deleteCookies("JSESSIONID")
@@ -47,4 +45,5 @@ public class SecurityConfig {
                 .httpBasic();
         return httpSecurity.build();
     }
+
 }
