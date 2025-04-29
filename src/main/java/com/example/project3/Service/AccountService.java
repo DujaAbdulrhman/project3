@@ -44,7 +44,7 @@ public class AccountService {
             throw new ApiException("account not found");
         }
         if (!account.getCustomer().getUser().getId().equals(userId)){
-            throw new ApiException("You don't have promotion to see this account");
+            throw new ApiException("You don't have permission to see this account");
         }
         return account;
     }
@@ -68,7 +68,7 @@ public class AccountService {
             throw new ApiException("Account not found");
         }
         if (!account.getCustomer().getUser().getId().equals(userId)){
-            throw new ApiException("you dont have a promotion ");
+            throw new ApiException("you dont have a permission ");
         }
         if (!account.getIsActive()){
             throw new ApiException("account is not active");
@@ -87,7 +87,7 @@ public class AccountService {
             throw new ApiException("Account not found");
         }
         if (!account.getCustomer().getUser().getId().equals(userId)){
-            throw new ApiException("you dont have a promotion ");
+            throw new ApiException("you dont have a permission ");
         }
         if (!account.getIsActive()){
             throw new ApiException("Account is not active");
@@ -130,7 +130,7 @@ public class AccountService {
         accountRepository.save(toAccount);
     }
 
-    // Block a bank account
+    // Block bank account
     public void blockAccount(Integer accountId){
         Account account = accountRepository.findAccountById(accountId);
         if (account==null){
