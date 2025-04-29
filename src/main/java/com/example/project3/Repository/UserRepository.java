@@ -14,5 +14,4 @@ public interface UserRepository extends JpaRepository<User,Integer> {
 
     User findUserById(Integer userId);
 
-    Customer findCustomeById(Integer id);
 }
