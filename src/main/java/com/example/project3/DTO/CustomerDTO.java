@@ -9,9 +9,11 @@ import lombok.Setter;
 @Setter @Getter @AllArgsConstructor @NoArgsConstructor
 public class CustomerDTO {
 
-    private Integer id;
-    private String phoneNumber;
+    @Valid
+    @NotNull(message = "User information is required")
+    private User user;
 
-    //عشان اعرف لاي يوزر هو
-    private Integer userId;
+    @Valid
+    @NotNull(message = "Customer information is required")
+    private Customer customer;;
 }
