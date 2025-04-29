@@ -9,11 +9,12 @@ import lombok.Setter;
 @Setter @Getter @AllArgsConstructor @NoArgsConstructor
 public class EmployeeDTO {
 
-    private Integer id;
-    private String position;
-    private double salary;
+   @Valid
+    @NotNull(message = "User information is required")
+    private User user;
 
-    //عشان اعرف لاي يوزر هو
-    private Integer userId;
+    @Valid
+    @NotNull(message = "Employee information is required")
+    private Employee employee;
 
 }
